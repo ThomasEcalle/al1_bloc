@@ -43,15 +43,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
               );
             case ProductsStatus.success:
               final products = state.products;
-              return ListView.builder(
-                itemCount: products.length + 1,
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return ListTile(
-                    title: Text(product.name ?? ''),
-                    subtitle: Text('${product.price}'),
-                  );
-                },
+              return RefreshIndicator(
+                onRefresh: () async => _refreshList(),
+                child: ListView.builder(
+                  itemCount: products.length + 1,
+                  itemBuilder: (context, index) {
+                    final product = products[index];
+                    return ListTile(
+                      title: Text(product.name ?? ''),
+                      subtitle: Text('${product.price}'),
+                    );
+                  },
+                ),
               );
           }
         },
