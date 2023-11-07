@@ -49,6 +49,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   final product = products[index];
                   return ListTile(
                     title: Text(product.name),
+                    subtitle: Text('${product.price}'),
                   );
                 },
               );
