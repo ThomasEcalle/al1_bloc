@@ -1,6 +1,18 @@
 part of 'products_bloc.dart';
 
-@immutable
-abstract class ProductsState {}
+enum ProductsStatus {
+  initial,
+  loading,
+  success,
+  error,
+}
 
-class ProductsInitial extends ProductsState {}
+class ProductsState {
+  final ProductsStatus status;
+  final List<Product> products;
+
+  ProductsState({
+    this.status = ProductsStatus.initial,
+    this.products = const [],
+  });
+}

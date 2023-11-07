@@ -6,18 +6,22 @@ part 'products_event.dart';
 part 'products_state.dart';
 
 class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
-  ProductsBloc() : super(ProductsInitial()) {
-    on<GetProducts>((event, emit) async {
-      await Future.delayed(const Duration(seconds: 2));
-      final products = List.generate(50, (index) {
-        return Product(
-          name: 'Produit $index',
-          description: 'Description $index',
-          price: index.toDouble(),
-        );
-      });
+  ProductsBloc() : super(ProductsState()) {
+    on<GetProducts>(_onGetProducts);
+  }
 
+  void _onGetProducts(GetProducts event, Emitter<ProductsState> emit) async {
+    emit(ProductsState(status: ProductsStatus.loading));
 
-    });
+    await Future.delayed(const Duration(seconds: 2));
+    final newState = ProductsState(
+      status: ProductsStatus.success,
+      products: [
+        Product(name: 'iPhone 15', price: 10),
+        Product(name: 'Pixel 7', price: 30),
+      ],
+    );
+
+    emit(newState);
   }
 }
