@@ -56,7 +56,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               return RefreshIndicator(
                 onRefresh: () async => _refreshList(),
                 child: ListView.builder(
-                  itemCount: products.length + 1,
+                  itemCount: products.length,
                   itemBuilder: (context, index) {
                     final product = products[index];
                     return ProductItem(

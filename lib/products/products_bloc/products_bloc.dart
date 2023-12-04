@@ -1,13 +1,16 @@
 import 'package:al1_bloc/products/models/product.dart';
 import 'package:bloc/bloc.dart';
-import 'package:dio/dio.dart';
 import 'package:meta/meta.dart';
+
+import '../services/products_repository.dart';
 
 part 'products_event.dart';
 part 'products_state.dart';
 
 class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
-  ProductsBloc() : super(ProductsState()) {
+  final ProductsRepository productsRepository;
+
+  ProductsBloc({required this.productsRepository}) : super(ProductsState()) {
     on<GetProducts>(_onGetProducts);
   }
 
@@ -15,7 +18,7 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
     emit(state.copyWith(status: ProductsStatus.loading));
 
     try {
-      final products = await _getAllProducts();
+      final products = await productsRepository.getAllProducts();
       emit(state.copyWith(
         status: ProductsStatus.success,
         products: products,
@@ -26,15 +29,5 @@ class ProductsBloc extends Bloc<ProductsEvent, ProductsState> {
         error: Exception(),
       ));
     }
-  }
-
-  Future<List<Product>> _getAllProducts() async {
-    final dio = Dio(
-      BaseOptions(baseUrl: 'https://dummyjson.com'),
-    );
-
-    final response = await dio.get('/products');
-    final jsonList = response.data['products'] as List;
-    return jsonList.map((jsonElement) => Product.fromJson(jsonElement)).toList();
   }
 }
