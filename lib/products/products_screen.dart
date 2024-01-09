@@ -29,6 +29,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('BUIIILD');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Produits'),
@@ -40,10 +41,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
       body: BlocBuilder<ProductsBloc, ProductsState>(
         builder: (context, state) {
+          print('STATE.STATUS: ${state.status}');
           switch (state.status) {
-            case ProductsStatus.initial:
-              return const SizedBox();
-            case ProductsStatus.loading:
+            case ProductsStatus.initial || ProductsStatus.loading:
               return const Center(
                 child: CircularProgressIndicator(),
               );
