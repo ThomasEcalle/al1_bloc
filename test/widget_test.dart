@@ -25,18 +25,27 @@ class SuccessFakeDataSource extends ProductsDataSource {
   }
 }
 
-class LoadingFakeDataSource extends ProductsDataSource {
+class EmptyDataSource extends ProductsDataSource {
   @override
   Future<List<Product>> getAllProducts() async {
+    await Future.delayed(const Duration(seconds: 2));
     return [];
   }
 }
 
-Widget _buildProductsScreen() {
+class ErrorDataSource extends ProductsDataSource {
+  @override
+  Future<List<Product>> getAllProducts() async {
+    await Future.delayed(const Duration(seconds: 2));
+    throw Exception();
+  }
+}
+
+Widget _buildProductsScreen(ProductsDataSource productsDataSource) {
   return RepositoryProvider(
     create: (context) => ProductsRepository(
-      remoteDataSource: SuccessFakeDataSource(),
-      localDataSource: SuccessFakeDataSource(),
+      remoteDataSource: productsDataSource,
+      localDataSource: productsDataSource,
     ),
     child: MultiBlocProvider(
       providers: [
@@ -59,14 +68,34 @@ Widget _buildProductsScreen() {
 void main() {
   group('ProductsScreen', () {
     testWidgets('ProductsScreen should display the right title', (WidgetTester tester) async {
-      await tester.pumpWidget(_buildProductsScreen());
+      await tester.pumpWidget(_buildProductsScreen(SuccessFakeDataSource()));
       await tester.pumpAndSettle();
       expect(find.text('Produits'), findsOneWidget);
     });
 
     testWidgets('ProductsScreen should load when getting products', (WidgetTester tester) async {
-      await tester.pumpWidget(_buildProductsScreen());
+      await tester.pumpWidget(_buildProductsScreen(SuccessFakeDataSource()));
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+    });
+
+    testWidgets('ProductsScreen should display the products when succeed', (WidgetTester tester) async {
+      await tester.pumpWidget(_buildProductsScreen(SuccessFakeDataSource()));
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+      expect(find.text('Product 0'), findsOneWidget);
+      expect(find.text('Product 1'), findsOneWidget);
+    });
+
+    testWidgets('ProductsScreen should display a specific message when empty results', (WidgetTester tester) async {
+      await tester.pumpWidget(_buildProductsScreen(EmptyDataSource()));
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+      expect(find.text('Aucun produit'), findsOneWidget);
+    });
+
+    testWidgets('ProductsScreen should display an error when getting one from api', (WidgetTester tester) async {
+      await tester.pumpWidget(_buildProductsScreen(ErrorDataSource()));
+      await tester.pumpAndSettle(const Duration(seconds: 2));
+      expect(find.text('Oups, on a une erreur'), findsOneWidget);
     });
   });
 }

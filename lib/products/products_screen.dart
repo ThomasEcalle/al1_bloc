@@ -53,6 +53,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
               );
             case ProductsStatus.success:
               final products = state.products;
+
+              if(products.isEmpty) {
+                return const Center(
+                  child: Text('Aucun produit'),
+                );
+              }
+
               return RefreshIndicator(
                 onRefresh: () async => _refreshList(),
                 child: ListView.builder(
